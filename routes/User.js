@@ -7,9 +7,10 @@ const {
   hashPwd,
   doesUserExist,
   auth,
+  checkPasswordsMatch,
 } = require("../middlewares/User");
 
-router.post("/signup", hashPwd, UsersController.signup);
+router.post("/signup", checkPasswordsMatch, hashPwd, UsersController.signup);
 router.post("/login", doesUserExist, UsersController.login);
 
 module.exports = router;

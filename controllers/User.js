@@ -4,16 +4,18 @@ require("dotenv").config();
 const { addUserModel } = require("../models/User");
 
 const signup = async (req, res) => {
-  const { name, email, password, repassword } = req.body;
+  const { name, email, password, repassword, age, topics } = req.body;
   try {
     const newUser = {
-      name: name,
-      email: email,
-      password: password,
-      repassword: repassword,
+      name,
+      email,
+      password,
+      repassword,
+      age,
+      topics,
     };
-    const userId = await addUserModel(newUser);
-    res.send({ userId: userId, ok: true });
+    // const userId = await addUserModel(newUser);
+    res.send({ userId: newUser, ok: true });
   } catch (err) {
     res.status(500).send(err);
   }
