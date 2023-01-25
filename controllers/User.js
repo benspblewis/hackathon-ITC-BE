@@ -4,19 +4,22 @@ require("dotenv").config();
 const { addUserModel } = require("../models/User");
 
 const signup = async (req, res) => {
-  const { name, email, password, repassword, age, topics } = req.body;
+  const { name, email, password, age,gender,photo } = req.body;
   try {
     const newUser = {
       name,
+      age,
+      gender,                                                                 
       email,
       password,
-      repassword,
-      age,
-      topics,
+      photo
     };
     const userId = await addUserModel(newUser);
-    res.send({ userId: newUser, ok: true });
+    if(userId){
+      res.send({ ok: true , message: "signup success" });
+    }
   } catch (err) {
+    console.log(err)
     res.status(500).send(err);
   }
 };
@@ -26,10 +29,13 @@ const login = async (req, res) => {
   try {
     bcrypt.compare(password, user.password, (err, result) => {
       if (err) {
+        console.log("here")
         res.status(500).send(err);
       } else if (!result) {
+        console.log("here too")
         res.status(400).send("Incorrect Password");
       } else {
+        console.log("here as well")
         const token = jwt.sign(
           { id: user.id, name: user.name, admin: user.isAdmin },
           process.env.TOKEN_SECRET,
@@ -40,6 +46,7 @@ const login = async (req, res) => {
           maxAge: 860000000,
           httpOnly: true,
         });
+        console.log("token works")
         res.send({
           ok: true,
           userId: user.id,
@@ -51,7 +58,7 @@ const login = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send("There was a problem");
   }
 };
 
