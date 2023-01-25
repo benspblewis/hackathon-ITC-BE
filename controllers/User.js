@@ -14,7 +14,7 @@ const signup = async (req, res) => {
       age,
       topics,
     };
-    // const userId = await addUserModel(newUser);
+    const userId = await addUserModel(newUser);
     res.send({ userId: newUser, ok: true });
   } catch (err) {
     res.status(500).send(err);

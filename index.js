@@ -12,6 +12,22 @@ app.use(cors());
 app.use("/chat", chatRoute);
 app.use("/user", userRoute);
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Listening on port ${port}`);
+// });
+
+///
+
+dbConnection.migrate
+.latest()
+.then((migration) =>{
+  if(migration){
+    console.log('Connected to DB', migration);
+    app.listen(port, ()=>{
+      console.log(`Server is listening on port ${port}`)
+    })
+  }
+})
+.catch((err)=> {
+  console.log(err)
+   return process.exit(1)})
