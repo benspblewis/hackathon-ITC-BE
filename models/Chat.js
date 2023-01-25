@@ -1,23 +1,30 @@
-const addChatRecordModel = async (userId,language) =>{
-    try{
-        //create object for params and add join timestamp
-        const response = await dbConnection('User_chat').insert()
-        if(response){
-            return response
-        }
-    }catch(err){
-        console.log(err)
+const addChatRecordModel = async (userId, chatId) => {
+  try {
+    const newUserChat = {
+      user_id: userId,
+      chat_id: chatId,
+      join_timestamp: new Date(),
+    };
+    const response = await dbConnection("User_chat").insert(newUserChat);
+    if (response) {
+      return response;
     }
-}
-const leaveChatModel = async (userId,chatId)=>{
-    try{
-        //close socket connection with room 
-        
-        const response = await dbConnection('User_chat').update()// add leave timestamp 
-        if(response) return response
-    }catch(err){
-        console.log(err)
-    }
-}
+  } catch (err) {
+    console.log(err);
+  }
+};
+const leaveChatModel = async (userId, chatId) => {
+  try {
+    //close socket connection with room
 
-module.exports ={addChatRecordModel,leaveChatModel}
+    const leaveTimestamp = { leave_timestamp: new Date() };
+    const response = await dbConnection("User_chat")
+      .update(leaveTimestamp)
+      .where({ user_id: userId, chat_id: chatId });
+    if (response) return response;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports = { addChatRecordModel, leaveChatModel };
