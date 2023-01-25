@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const e = require("express");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-
+const {getUserByEmailModel} = require('../models/User')
 const hashPwd = (req, res, next) => {
   const saltRounds = 10;
   bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
