@@ -4,7 +4,7 @@ const chatController = require("../controllers/Chat");
 
 //join chat
 
-router.post("/join-chat", chatController.addChatRecord);
+router.post("/join-chat", chatController.enterChat);
 
 router.put("/leave-room", chatController.leaveChat);
 

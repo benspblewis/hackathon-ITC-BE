@@ -1,17 +1,39 @@
 const { default: axios } = require("axios");
-const { addChatRecordModel, leaveChatModel } = require("../models/Chat");
+const {
+  addChatRecordModel,
+  leaveChatModel,
+  roomAssignModel,
+} = require("../models/Chat");
 
-const addChatRecord = async (req, res) => {
+const enterChat = async (req, res) => {
   try {
     const { userId, language } = req.body;
-    const chatId = await axios.post("API URL", req.body);
+    const chatIdResponse = await axios.get(
+      "http://ec2-35-159-22-109.eu-central-1.compute.amazonaws.com:8080/get_chat_id",
+      { data: req.body }
+    );
+    let chatId = await chatIdResponse.data;
     if (!chatId) {
       throw new Error("chatId not found");
     }
-    const success = await addChatRecordModel(userId, chatId);
-    if (success) {
-      // axios post chat Id
-      res.send({ ok: true, chatId: chatId });
+    if (chatId == 0) {
+      const chatRoomAssignResponse = await roomAssignModel(userId, language);
+      if (!chatRoomAssignResponse) {
+        throw new Error("chat room not created");
+      }
+      if (chatRoomAssignResponse) {
+        chatId = chatRoomAssignResponse;
+        const chatRecordResponse = await addChatRecordModel(userId, chatId);
+        if (chatRecordResponse) {
+          res.send({ ok: true, chatId: chatId });
+        }
+      }
+    }
+    if (chatId != 0) {
+      const chatRecordResponse = await addChatRecordModel(userId, chatId);
+      if (chatRecordResponse) {
+        res.send({ ok: true, chatId: chatId });
+      }
     }
   } catch (err) {
     console.log(err);
@@ -30,4 +52,4 @@ const leaveChat = async (req, res) => {
     console.log(err);
   }
 };
-module.exports = { addChatRecord, leaveChat };
+module.exports = { enterChat, leaveChat };
