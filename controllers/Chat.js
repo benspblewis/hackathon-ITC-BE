@@ -6,6 +6,7 @@ const {
 } = require("../models/Chat");
 
 const enterChat = async (req, res) => {
+  console.log(req.body)
   try {
     const { userId, language } = req.body;
     // const chatIdResponse = await axios.get(
@@ -38,7 +39,7 @@ const enterChat = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err);
+    err.status(404).send(err)
   }
 };
 
