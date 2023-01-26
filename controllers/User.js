@@ -1,25 +1,25 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { addUserModel } = require("../models/User");
+const { addUserModel, addInterestsModel } = require("../models/User");
 
 const signup = async (req, res) => {
-  const { name, email, password, age,gender,photo } = req.body;
+  const { name, email, password, age, gender, photo } = req.body;
   try {
     const newUser = {
       name,
       age,
-      gender,                                                                 
+      gender,
       email,
       password,
-      photo
+      photo,
     };
     const userId = await addUserModel(newUser);
-    if(userId){
-      res.send({ ok: true , message: "signup success" });
+    if (userId) {
+      res.send({ ok: true, message: "signup success" });
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.status(500).send(err);
   }
 };
@@ -29,13 +29,13 @@ const login = async (req, res) => {
   try {
     bcrypt.compare(password, user.password, (err, result) => {
       if (err) {
-        console.log("here")
+        console.log("here");
         res.status(500).send(err);
       } else if (!result) {
-        console.log("here too")
+        console.log("here too");
         res.status(400).send("Incorrect Password");
       } else {
-        console.log("here as well")
+        console.log("here as well");
         const token = jwt.sign(
           { id: user.id, name: user.name, admin: user.isAdmin },
           process.env.TOKEN_SECRET,
@@ -46,7 +46,7 @@ const login = async (req, res) => {
           maxAge: 860000000,
           httpOnly: true,
         });
-        console.log("token works")
+        console.log("token works");
         res.send({
           ok: true,
           userId: user.id,
@@ -62,4 +62,20 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { signup, login };
+const addInterests = async (req, res) => {
+  const interestsArray = req.body;
+  interestsArray.map(async (interest) => {
+    try {
+      const id = await addInterestsModel(interest);
+      if (!id) {
+        return;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  res.send({ ok: true, message: "interests added" });
+  return;
+};
+
+module.exports = { signup, login, addInterests };
