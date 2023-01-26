@@ -4,8 +4,8 @@ const app = express();
 const port = 8080 || process.env.PORT;
 const dbConnection = require("./knex/knex");
 const http = require('http').Server(app)
-
-
+const { userJoin, getCurrentUser ,getRoomUsers,userLeave} = require("./utils/users");
+const {formatMessage} = require('./utils/messages')
 const chatRoute = require("./routes/Chat");
 const userRoute = require("./routes/User");
 app.use(express.json());
@@ -25,27 +25,38 @@ const socketIO = require('socket.io')(http, {
 });
 
 
-let users = [];
+
+
+//runs on clint connection 
+const botName = "ChatCordBot";
 socketIO.on('connection', (socket) => {
-  console.log(`⚡: ${socket.id} user just connected!`);
-  socket.on('message', (data) => {
-    socketIO.emit('messageResponse', data);
+  
+  socket.on('joinRoom', ({userId,roomId,userName})=>{
+    const user = userJoin(socket.id, userId,roomId,userName)
+    socket.join(user.roomId)
+    socketIO.emit("message", formatMessage(botName, "Welcometo LingoChat!"));
+  })
+  socket.on('chatMessage', (message) => {
+    console.log(message)
+    const user = getCurrentUser(socket.id);
+    console.log(user)
+    socketIO.to(user.roomId).emit('message', formatMessage(user.userName, message));
   });
   
-  socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
+  // socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
 
-  socket.on('newUser', (data) => {
-    users.push(data);
-    console.log(users);
-    socketIO.emit('newUserResponse', users);
-  });
+  // socket.on('newUser', (data) => {
+  //   users.push(data);
+  //   console.log(users);
+  //   socketIO.emit('newUserResponse', users);
+  // });
 
-  socket.on('disconnect', () => {
-    console.log('🔥: A user disconnected');
-    users = users.filter((user) => user.socketID !== socket.id);
-    socketIO.emit('newUserResponse', users);
-    socket.disconnect();
-  });
+  // socket.on('disconnect', () => {
+  //   console.log('🔥: A user disconnected');
+  //   users = users.filter((user) => user.socketID !== socket.id);
+  //   socketIO.emit('newUserResponse', users);
+  //   socket.disconnect();
+  // });
 });
 
 
