@@ -1,4 +1,5 @@
 const { default: axios } = require("axios");
+const dbConnection = require("../knex/knex");
 const {
   addChatRecordModel,
   leaveChatModel,
@@ -19,7 +20,7 @@ const enterChat = async (req, res) => {
     //   throw new Error("chatId not found");
     // }
     if (chatId == 0) {
-      const chatRoomAssignResponse = await roomAssignModel(userId, language);
+      const chatRoomAssignResponse = await roomAssignModel(language);
       if (!chatRoomAssignResponse) {
         throw new Error("chat room not created");
       }
@@ -27,7 +28,9 @@ const enterChat = async (req, res) => {
         chatId = chatRoomAssignResponse;
         const chatRecordResponse = await addChatRecordModel(userId, chatId);
         if (chatRecordResponse) {
-          res.send({ ok: true, chatId: chatId });
+          const [userInfo] = await  dbConnection.from("Users").where({id: userId})
+          console.log(userInfo)
+          res.send({ ok: true, chatId: 30, activeUser: userInfo});
           return;
         }
       }
@@ -39,7 +42,7 @@ const enterChat = async (req, res) => {
       }
     }
   } catch (err) {
-    err.status(404).send(err)
+    res.status(404).send(err)
   }
 };
 

@@ -14,8 +14,6 @@ app.use(cors());
 app.use("/chat", chatRoute);
 app.use("/user", userRoute);
 
-
-
 //--------------------------
 
 const socketIO = require('socket.io')(http, {
@@ -34,13 +32,21 @@ socketIO.on('connection', (socket) => {
   socket.on('joinRoom', ({userId,roomId,userName})=>{
     const user = userJoin(socket.id, userId,roomId,userName)
     socket.join(user.roomId)
-    socketIO.emit("message", formatMessage(botName, "Welcometo LingoChat!"));
+    socket.emit("message", formatMessage(botName, "Welcometo LingoChat!"));
   })
   socket.on('chatMessage', (message) => {
     console.log(message)
     const user = getCurrentUser(socket.id);
     console.log(user)
     socketIO.to(user.roomId).emit('message', formatMessage(user.userName, message));
+  });
+
+  socket.on("disconnect", () => {
+    const user = userLeave(socket.id);
+    
+    if(user){
+      socketIO.to(user.room).emit("message", formatMessage(botName,`${user.userName} has left the chat`));
+    }
   });
   
   // socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
