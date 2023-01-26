@@ -31,15 +31,14 @@ const leaveChatModel = async (userId, chatId) => {
 
 const roomAssignModel = async (language) => {
   try {
-    const chat_id = Math.random();
     const response = await dbConnection("Chat_Rooms").insert({
-      chat_id: chat_id,
       language: language,
+      active_users: 1,
     });
     if (!response) {
       return { ok: false, message: "chat room not created" };
     }
-    return chat_id;
+    return response[0];
   } catch (err) {
     console.log(err);
   }
