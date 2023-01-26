@@ -13,4 +13,6 @@ const {
 router.post("/signup", checkPasswordsMatch, hashPwd, UsersController.signup);
 router.post("/login", doesUserExist, UsersController.login);
 
+router.post("/add-interests", UsersController.addInterests);
+
 module.exports = router;
