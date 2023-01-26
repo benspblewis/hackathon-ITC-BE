@@ -14,31 +14,30 @@ const enterChat = async (req, res) => {
     //   { data: req.body }
     // );
     // let chatId = await chatIdResponse.data;
+    let chatId = 0;
     // if (!chatId) {
-    //   console.log("errorhere")
     //   throw new Error("chatId not found");
     // }
-    // if (chatId == 0) {
-    //   const chatRoomAssignResponse = await roomAssignModel(userId, language);
-    //   if (!chatRoomAssignResponse) {
-    //     throw new Error("chat room not created");
-    //   }
-    //   if (chatRoomAssignResponse) {
-    //     chatId = chatRoomAssignResponse;
-    //     const chatRecordResponse = await addChatRecordModel(userId, chatId);
-    //     if (chatRecordResponse) {
-    //       res.send({ ok: true, chatId: chatId });
-    //     }
-    //   }
-    // }
-    // if (chatId != 0) {
-    //   const chatRecordResponse = await addChatRecordModel(userId, chatId);
-    //   if (chatRecordResponse) {
-    //     res.send({ ok: true, chatId: chatId });
-    //   }
-    // }
-
-    res.send({chatId: 30 })
+    if (chatId == 0) {
+      const chatRoomAssignResponse = await roomAssignModel(userId, language);
+      if (!chatRoomAssignResponse) {
+        throw new Error("chat room not created");
+      }
+      if (chatRoomAssignResponse) {
+        chatId = chatRoomAssignResponse;
+        const chatRecordResponse = await addChatRecordModel(userId, chatId);
+        if (chatRecordResponse) {
+          res.send({ ok: true, chatId: chatId });
+          return;
+        }
+      }
+    }
+    if (chatId != 0) {
+      const chatRecordResponse = await addChatRecordModel(userId, chatId);
+      if (chatRecordResponse) {
+        res.send({ ok: true, chatId: chatId });
+      }
+    }
   } catch (err) {
     err.status(404).send(err)
   }
